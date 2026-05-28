@@ -1,0 +1,730 @@
+PHYSICAL REVIEW A 102, 042609 (2020)
+
+Prospect of using Grover’s search in the noisy-intermediate-scale quantum-computer era
+Yulun Wang
+
+and Predrag S. Krstic
+
+*
+
+Institute for Advanced Computational Science, Stony Brook University, Stony Brook, New York 11794-5250, USA
+(Received 21 June 2020; accepted 18 September 2020; published 20 October 2020)
+In order to understand the bounds of utilization of Grover’s search algorithm for large unstructured data in the
+presence of quantum computer noise, we undertake a series of simulations by inflicting various types of noise,
+modeled by the IBM QISKIT. We apply three forms of Grover’s algorithm: (i) the standard one, with 4–10 qubits;
+(ii) a recently published modified Grover’s algorithm, set to reduce the circuit depth; and (iii) the algorithms in (i)
+and (ii) with multicontrol Toffoli’s gates modified by the addition of an ancilla qubit. Based on these simulations,
+we find the upper bound of noise for these cases, establish its dependence on the quantum depth of the circuit,
+and provide comparison among them. By extrapolation of the fitted thresholds, we predict what would be the
+typical gate error bounds when applying Grover’s algorithms for the search of data in a data set as large as
+32 000.
+DOI: 10.1103/PhysRevA.102.042609
+
+I. INTRODUCTION
+
+Grover’s algorithm (GA) [1,2] for the search of unstructured data shows an obvious and convincing quantum
+advantage to the classical search algorithms. Thus, GA scales
+the number of search iterations (i.e., the search time) with
+√
+N rather than with N in the classical search, where N is the
+number of searched data. This polynomial acceleration has
+been proved to be optimal for the data search problems [3]: A
+search job that would run on a classical computer one month
+would take about 3.5 h to finish on a quantum computer using
+Grover’s algorithm.
+Running algorithms such as Grover’s search on modern,
+quantum-circuit-based quantum computers is achieved by
+consecutive unitary operations. However, the imperfect quantum gates and the thermally induced decoherence in the NISQ
+(noisy intermediate-scale quantum) computers are the major
+source of noise in current hardware, producing errors in the
+quantum operations [4]. The size of the quantum circuit is
+characterized by the total number of gates, and often by the
+circuit depth, the largest number of gates along any inputoutput path, moving forward in time. Thus, circuit depth is
+proportional to the smallest amount of time steps to execute
+the circuit, assuming that each gate is performed within a
+time step, and the gates that act on independent qubits can
+be executed simultaneously. Many researchers have analyzed
+the impact of various noise types in Grover’s search algorithm [5–9]. With a large circuit depth, quantum programs
+for complex tasks propagate and accumulate errors throughout
+the whole quantum circuit. As a consequence, the search for
+the targeted data fails because of the small signal-to-noise
+ratio. For example, with the current level of noise in superconducting quantum devices (like the IBM Q and Rigetti),
+one could clearly select an element among 8 data (3 qubits),
+
+*
+
+krsticps@gmail.com
+
+2469-9926/2020/102(4)/042609(8)
+
+while the search for an element among the 16 data (4 qubits)
+fails. We show in Fig. 1 the results of the search of the 0011
+element at the 4-qubit Hilbert space using an IBM Q computer
+of the latest generation. Due to the noise the targeted state
+probability is not distinguishable from the probabilities of the
+other states. A deterministic version of GA [10] has been
+proposed to keep the ideal target probability 100% for any
+size of database, which is slightly improved from the standard
+GA (SGA) [1], but it does not necessarily help to distinguish
+a searched target in the presence of the noise. For the SGA,
+the circuit depth and the total number of gates exponentially
+increase with the number of qubits, which might induce exponential magnification of the noise assuming the worst case
+that errors are produced with some probability at each gate.
+For example, the circuit depth with 3 qubits is 58 (95 gates),
+with 4 qubits the depth grows to 242 (322 gates), and for 6
+qubits it reaches 1922 (2418 gates).
+In this work we define the selectivity S,
+S = 10 log10 (Pt /Phn ),
+
+(1)
+
+to be the metric that quantifies the performance of the quantum algorithm, where Pt is the measured probability of the
+targeted state and Phn is the probability of the highest measured noise signal. The selectivity decreases with increases
+of the noise probabilities. In Fig. 1, the largest noise-induced
+probability is of the 0000 state (7.6%), which is higher than
+the target probability (6.6%), leading to a negative selectivity,
+indicating an unsuccessful search. In this study we choose
+S = 3 for the lowest acceptable threshold of the selectivity,
+which corresponds to Pt /Phn ≈ 2. When S = 3 is reached,
+the item searched by Grover’s algorithm is considered well
+distinguishable from the noise, and we consider the algorithm
+to be successfully executed. Thus, this value of the selectivity
+defines the highest acceptable bound of the noise for the
+successful Grover’s operation. The threshold error probabilities and damping parameters in this work are obtained by
+interpolating the computed data to the selectivity S = 3.
+
+042609-1
+
+©2020 American Physical Society
+
+YULUN WANG AND PREDRAG S. KRSTIC
+
+PHYSICAL REVIEW A 102, 042609 (2020)
+
+FIG. 1. The 4-qubit Grover’s search of 0011 in a set of 16 data on
+IBM’s latest quantum computer “ibmq_paris.” The ideal probability
+to measure “0011” is 96.7%; however, the measured one is only 6.6%
+due to the quantum noise and the specific topology of the machine.
+
+The goal of this paper is not to mitigate the errors in
+Grover’s quantum circuit, but rather to predict how small these
+errors need to be in order to reach the acceptable selectivity of the targeted state. This is done by replicating various
+types of noise in the circuits and performing simulation of
+Grover’s algorithm by varying the number of qubits n from
+4 to 10, which alters the size of the searched data sets as 2n .
+The quantum circuit depth is increased exponentially with the
+number of qubits using the SGA reflecting the dependence on
+n of the multicontrol Toffoli (MCT) gates present in oracle
+and diffusion operators as well as the number of iterations,
+proportional to 2n/2 (see Note SI in the Supplemental Material
+[11]). However, this increase can be restrained by adding ancillas to MCTs (labeled here as MCTA) in both the SGA and
+the recently published Grover’s algorithms modified (MGA)
+for reduction of the circuit depth [12]. With fewer gates in a
+circuit, smaller gate operational errors are accumulated, and
+the coherent time domain is increased. We find that adding
+one ancilla to the MCTs, as done in IBM Quantum Information Science Kit (QISKIT) [13] following Barenco et al. [14],
+strongly reduces the circuit depth and consequently reduces
+the overall noise in all studied cases.
+In Sec. II we introduced the background of noise simulation, as defined in QISKIT. In Secs, III and IV we perform
+experiments of simulation for various errors by varying the
+number of qubits (i.e., varying the number of gates in the
+quantum circuit) to obtain the upper bound of the thresholds
+toward a successful Grover’s search. The SGA with the use
+of MCTs and MCTAs is studied in Sec. III for the circuit
+depth and the response to the various errors in the circuit.
+The same is done in Sec. IV where the error response of the
+modified GA, which achieves circuit depth reduction by use
+of the local diffusion operators [12], is studied. In Sec. V we
+provide comparison of the selectivity thresholds due to the errors between all considered algorithms, highlighting the most
+successful ones. Finally, in Sec. VI we give our conclusions.
+II. NOISE SIMULATION
+
+Various types of errors have been identified and characterized in superconducting quantum computers. The design of
+a quantum computer can be evaluated by the coherence time
+of a qubit (natural relaxation time, T1 , and the time for the
+
+qubit dephasing from the superposition state, T2 ), as well as
+by the gate errors [single-qubit rotations and 2-qubit operations, such as controlled-NOT (CNOT)] [15] and readout errors.
+Soft methods have been developed to mitigate particular error
+types. However, the utilization of these methods makes the
+quantum circuit more complex, bringing in more gates and
+more errors, which limits their effectiveness.
+In the real quantum devices, qubits suffer simultaneously
+from various types of gate errors and decoherence, which
+makes extraction of the effects of the individual errors a
+formidable task. The error probabilities are often characterized by the qubit multiplicity of the various quantum operations. For the latest superconducting quantum-computers from
+IBM (for example, ibmq_cambridge at 18:23:30 on May 4,
+2020), single qubit instructions have an average error probability of 0.093% for U2 gate operations and 0.19% for U3
+gate operations, while the CNOT gates have an average error
+probability of 3.5%. The U3 gate is defined in QISKIT as a
+single-qubit rotation gate with three Euler angles: θ , φ, and
+λ by U3 (θ , φ, λ) = RZ (φ)RX (− π2 )RZ (θ )RX ( π2 )RX (λ), where
+RZ (θ ) and RX (θ ) are the single-qubit rotations around the Z
+and X axes with an angle of θ on the Bloch sphere, while
+the U2 gate is defined as U2 (φ, λ) = U3 ( π2 , φ, λ). Besides gate
+errors, this machine also suffers from a significant readout
+error at average 9.5% and limited coherent time (average
+T1 = 82 μs and T2 = 41 μs).
+We study the effects of the gate and the coherent qubit
+time errors as modeled in QISKIT (version 1.16.0) [13]. Gate
+errors such as bit and phase flip (so-called Pauli errors) and
+depolarization are modeled by assuming that an error happens
+with some probability in each gate in the quantum circuit
+[16]. The Kraus√operators for the Pauli errors are defined in
+√
+QISKIT as E0 = 1 − pσ I and E1 = pσ σ , where pσ is the
+error probability and σ = X (bit flip), Z (phase flip), Y (combined flips), respectively [13]. These operators yield the mixed
+states ρ  = ε(ρ) = E0 ρE0† + E1 ρE1† = (1 − pσ )ρ + pσ σ ρσ ,
+where the initial state is described by the density operator
+ρ and the functional ε is the quantum operation. A qubit is
+flipped with probability pσ or left unchanged with probability
+1 − pσ . With a depolarization error, a qubit is depolarized
+with a probability pdep . The depolarization channel is defined
+as ε(ρ) = (1 − pdep )ρ + pdep 2In , where I is the completely
+mixed state density and n is the number of qubits in the error
+channel [17].
+Keeping a quantum state coherent is essential for implementation of gate operations and measurements of qubits
+in quantum computing. Induced by external disturbances,
+decoherence erodes the fidelity of quantum executions due
+to coupling between the quantum system and the environment. Thus, decoherence of quantum states is a large obstacle
+to scalable quantum computing. We study the Grover’s circuit response to the amplitude damping (AD) and the phase
+damping (PD). In these cases the dimensionless damping
+probability pdam defines
+√ the Kraus operators E0,1 [17,18] as
+E0 |0 = |0, E0 |1 = 1 − pdam |1, and E1 |0 = 0 for both
+√
+AD and PD, while E1 |1 = pdam |x, where x = 0 for AD
+and x = 1 for PD, pdam is the probability of either energy loss
+(AD) or information loss (PD) to the environment in a small
+time interval δt. After these dissipation processes repeat many
+(m) times in succession, during the gate time tg = mδt, the
+
+042609-2
+
+PROSPECT OF USING GROVER’S SEARCH IN THE …
+
+PHYSICAL REVIEW A 102, 042609 (2020)
+
+corresponding transition channel decays exponentially [19] as
+e− tg , where is the probability rate = pδtdam . The amplitude
+damping is often referred to as the relaxation process for
+the time T1 , where T1 = 1 and is the amplitude-damping
+probability rate. Similarly, the phase damping is referred to
+as the superposition dephasing process for the time T2 , where
+T2 = 1 and is the phase-damping rate. T1 and T2 together
+are employed to characterize the lifetime of the qubit’s amplitude and phase. The quantum error channels mentioned above
+are applied to all single-qubit quantum operations during the
+noise simulation. The error channels for 2-qubit operations
+are obtained by applying the single-qubit error to each of two
+qubits (for example, CNOT) [13].
+QISKIT supports simulation of the thermal relaxation mode
+by inputting values for T1 and T2 with predefined gate time tg,
+where T2 ⩽ 2T1 [20,21]. The gate time tg in the model is set
+to 50 ns for single-qubit U2 rotations, 100 ns for U3 rotations,
+300 ns for CNOT gates, 1000 ns for qubit reset, and 1000 ns for
+measurements. The T1 and T2 relaxation error rates are defined
+as εT1 = e−tg/T1 and εT2 = e−tg/T2 , respectively [22].
+We also apply our error analysis of Grover’s algorithm
+(with MCTs or MCTAs) to the method targeted to lowering
+the circuit depth (and fewer number of gates), recently published by Zhang and Korepin [12]. They achieved reduction
+of the number of gates by replacing the standard Grover’s
+operator with the depth-modified one in adjusted sequences,
+in which the standard diffusion operator is replaced by a local
+diffusion operator [23]. Furthermore, the depth-reduced algorithm can be executed in multiple stages to eliminate noise.
+For example, the search target can be divided into two stages,
+t1 and t2 , with |t = |t1  > |t2 . After the first stage |t1 , partial
+measurement is applied to terminate the search in some of the
+qubits. The quantum measurements in the first stage can avoid
+qubit idling with unwanted noise in the second stage. The rest
+of the qubits are reset and reinitialized before the execution
+of the second stage, which also eliminates the unwanted noise
+accumulated in the first stage. We here apply MCTA gates of
+this modified Grover’s algorithm, obtaining further reduction
+of the circuit depth and thus increasing the thresholds in all
+studied quantum errors.
+III. GROVER’S CIRCUIT WITH ANCILLARY QUBITS
+
+MCT gates are the key components of oracle and diffusion
+operators for the Grover’s search. Current IBM quantum computers allow only elementary executions such as single-qubit
+rotations and controlled 2-qubit gates. Thus, the multiplequbit Toffoli gates are decomposed to elementary operations
+during circuit transpiling by QISKIT and hence occupy the
+biggest part of the circuit depth, resulting in the main sources
+of noise. By using MCTAs the circuit depth and the number of total gates can be dramatically reduced. In this work,
+nonancilla Toffoli gates and 1-ancilla Toffoli gates are used
+for composing circuits with different depths. Circuits for the
+MCT and MCTA gates are generated by QISKIT functions
+(using qiskit.aqua.circuits.gates.mct with modes “noancilla”
+and “advanced” which are based on the gray-code sequence
+and the recursive splitting method for nonancilla and 1-ancilla
+Toffoli gates, respectively [14]). When designing quantum
+circuits, various searched targets have their unique oracles.
+
+FIG. 2. Threshold error probabilities for (a) bit flip (BF), phase
+flip (PF), and depolarizing (DEP) and for (b) threshold damping parameters of amplitude damping (AD) and phase damping (PD), with
+various numbers of qubits in the GA search. The hollow symbols
+and solid symbols are for SGA and SGAA, respectively. Dashed
+(SGA) and solid (SGAA) lines are fitting curves with extrapolation,
+as described in the text.
+
+Only one MCT gate is required to construct the oracle for
+the encoded search state |1. Hence for the simplest circuit,
+|1⊗n is chosen as the searched target item in all tests [24].
+The gate numbers and the circuit depth are calculated with
+QISKIT functions by varying the number of qubits from 4 to
+14, for the SGA as well as for the circuits where MCTAs
+replaced MCTs (SGAA). These are shown in Table SI of the
+Supplemental Material [11]. For example, in the n = 4 qubit
+SGA, 3 iterations (marked as G34 ) are applied, which yields
+322 for the total number of gates. When using MCTAs, the
+reduction of the number of gates for n = 4 qubits is about 1.3
+times. In the 10-qubit algorithm, the number of gates in the
+circuit is reduced nearly 10 times by using MCTAs. For the
+14-qubit algorithm this reduction is nearly 50. This leads to
+a noticeable degradation of noise, especially when increasing
+the number of qubits, as our results below show.
+We calculated the upper bounds of noise defined by the
+lowest acceptable selectivity defined in the Introduction. We
+present these bounds in Fig. 2 for both the SGA and the
+SGAA, by changing the types of noise and varying the number
+of qubits from 4 to 10. As discussed in the Introduction, using
+MCTAs in the SGA increases the upper bound of thresholds
+in all studied cases as a consequence of significant contraction
+of the quantum depths and the total number of gates (see
+Table SI in the Supplemental Material [11]). This contraction
+increases with the number of qubits. Even though the gate
+errors are accumulated after each gate operation, the noise
+is significantly suppressed with the reduction of the number
+
+042609-3
+
+YULUN WANG AND PREDRAG S. KRSTIC
+
+PHYSICAL REVIEW A 102, 042609 (2020)
+
+of gates. From Fig. 2, the circuit for the 4-qubit SGA requires the Pauli, depolarization, and amplitude-damping error
+probabilities below 10−2 and phase damping below 3 × 10−2
+for acceptable search results, with similar conclusions for the
+SGAA. With the 8-qubit search, the SGA and the SGAA start
+deviating from each other. The 10-qubit SGA circuit requires
+error probabilities below 10−5 (except for phase damping
+<10−4 ), while a circuit depth of the SGAA an order of
+magnitude lower than that of the SGA produces a leap in
+selectivity; i.e., error thresholds are of the order of 10−4 . Thus,
+when searching a database of the size of 210 , the upper bound
+of the depolarization error, for example, is about 2 × 10−4 .
+Similar conclusions can be obtained for amplitude-damping
+(<2 × 10−4 ) and phase-damping (<7 × 10−4 ) noise, as well
+as for bit-flip and phase-flip error probabilities (<10−4 ): the
+threshold parameter values increase an order of magnitude in
+10-qubit cases when MCTAs are used.
+The selectivity thresholds in Fig. 2 are directly correlated
+to the number of gates in the circuits when varying the number
+of qubits. To understand this correlation, we first fitted the
+data for the number of gates in Table SI of Supplemental
+Material [11] vs the number of qubits (4 to 14 qubits) using the
+functional forms inspired by the analysis of Barenco et al. [14]
+on the number of gates in the MCTs with and without ancilla.
+This is explained in detail in Note SI of the Supplemental
+Material [11]. For the SGA case, the number of gates (G) is
+an exponential function of n, with the fitting function GSGA =
+4.6991e1.0388n , reflecting the number of iterations, 2n/2 , as
+well as 2n functional dependence of MCTs on n. However,
+the combined product of exponential and power dependencies
+fits best the SGAA cases, GSGAA = 1.2761n2.8401 e0.3436n . The
+exponent here corresponds to the 2n/2 number of iterations,
+which confirms the polynomial dependence of the number of
+gates on a MCT with ancilla [14]. Similar functional dependencies are obtained for the circuit depths of the SGA and
+the SGAA, due to the almost constant ratio of number of
+gates and the circuit depth in Table SI of the Supplemental
+Material [11]. Since it is expected that the quantum errors
+are accumulated proportionally to the number of gates in a
+circuit, it is not surprising that the best fits for the selectivity
+thresholds (lines in Fig. 2) are obtained with fitting models
+similar to those for GSGA and GSGAA , even with similar values
+of exponents. The fitted curves, obtained with high correlations, are shown in Fig. 2 with dashed and solid lines and
+fitting parameters are listed in Table SII of the Supplemental
+Material [11]. Although the simulations were done with a
+top-of-the-line supercomputing cluster [25], 10 qubits was the
+limit for successful simulation of GA with QISKIT, mainly due
+to the large memory requirements in a classical computer.
+Still, by extrapolation of the obtained fits we can predict
+with certainty the selectivity thresholds for larger numbers of
+qubits. Thus, for the SGA with 15 qubits the threshold error
+probabilities are as low as 10−6 for phase damping and 10−7
+for other types of errors. However, the SGAA improves the
+error threshold by about 2 orders of magnitude. For example,
+the upper bound of depolarizing noise increases from about
+4 × 10−7 to 1.75 × 10−5 .
+Calculated variations of the thermal relaxation times T1 and
+T2 with the number of qubits are presented in Fig. 3. Symbols
+in the figure show thresholds of the lower bound for T1 and T2
+
+FIG. 3. Selectivity thresholds for the thermal relaxation times of
+the SGA and the SGAA with various numbers of qubits.
+
+defined for the selectivity in the range 2.5 to 3.5 (i.e., Pt /Phn in
+range 1.778 to 2.239). Unlike the other types of noise where it
+was favorable to have a bigger threshold, T1 and T2 are desired
+to have lower thresholds, which leads to a smaller coherent
+time for execution of the SGA and the SGAA. Each point in
+the figure is independently calculated and collected for given
+T1 and T2 . The results for the 10-qubit SGA search could
+not be obtained because the thresholds T1 and T2 exceed the
+QISKIT simulation limits (2500 μs). For example, a successful
+search through a set of 24 data can be done with T1 and T2
+in the range of 15–50 μs with both the SGA and the SGAA,
+which is well achievable by current quantum hardware. For
+the 26 data set, the thresholds for T1 and T2 increase to about
+100 μs with the SGAA and close to 200 μs with the SGA,
+while for the 8-qubit search T1 and T2 average around 1150
+and 330 μs, respectively, with the SGAA, but about 1230 and
+590 μs, respectively, with the SGA. For the 10-qubit SGA, the
+requirements for T1 and T2 exceed 10 ms with a total circuit
+depth of 128 002. Better results are obtained with the SGAA.
+Thus, the relaxation time limits for T1 and T2 with 10 qubits
+average 1.8 and 1 ms, respectively.
+IV. GROVER’S CIRCUIT BY LOCAL
+DIFFUSION OPERATORS
+
+The selectivity thresholds are calculated in this section for
+the GA with a modified circuit to reduce the quantum depth
+[12] (MGA) in two variants, one-stage (M1GA) and two-stage
+(M2GA) with inclusion of noise, as was done in Sec. III.
+In addition, we also studied the MGA with one ancilla in
+MCTs (MkGAA, k = 1 and 2), which showed, like in the
+case of the SGAA, a further improvement in the error thresholds. Table SIII in the Supplemental Material [11] contains
+the studied configurations as well as the information on the
+relevant quantum depths and the number of gates (including
+both 1- and 2-qubit gates). One-stage and two-stage methods
+of depth optimization are both tested for 4–10 qubit cases.
+Figure S2 in Note SII of the Supplemental Material [11]
+illustrates schematically, as an example, the quantum circuits
+for the SGA and the MGA configurations with 4 qubits. The
+MGA circuit configurations in Table SIII of the Supplemental
+Material [11] are also studied using MCTAs in place of MCTs,
+convincingly reducing the depth of the circuits.
+
+042609-4
+
+PROSPECT OF USING GROVER’S SEARCH IN THE …
+
+PHYSICAL REVIEW A 102, 042609 (2020)
+
+FIG. 5. Selectivity thresholds for thermal noise of two-stage
+modified Grover’s searches [12] (M2GA and M2GAA). Similar results calculated for the one-stage algorithm are shown in Fig. S4 of
+the Supplemental Material [11].
+
+FIG. 4. Fitting curve of selectivity thresholds for the error probability vs the number of qubits for various types of errors [BF, PF,
+and DEP in panel (a) and AD and PD in panel (b)] applied at the
+two-stage depth-reduced GA [12] with the use of MCTs (M2GA)
+and of MCTAs (M2GAA). Figure S3 in the Supplemental Material
+[11] shows the calculated data for the one-stage depth-reduced GA.
+
+The dependencies of the number of gates on the number of
+qubits have the functional forms used in Sec. III and discussed
+in Note SI of the Supplemental Material [11]. As one would
+expect, the numbers of gates for M1GA and M2GA fit well
+the exponential function of the number of qubits, GM1GA =
+5.0785e0.9953n and GM2GA = 3.8835e1.0220n , respectively. On
+the other hand, the power-times-exponential function fits well
+the number of gates vs the number of qubits for M1GAA and
+M2GAA, i.e., GM1GAA = 1.2823n2.5439 e0.3880n and GM2GAA =
+0.7670n2.7057 e0.4125n . The extrapolations of the fitting functions imply that the M1GA circuit requires over 15 000 000
+gates with the 15 qubits and nearly 18 000 000 gates for
+M2GA. In comparison with 27 000 000 gates for the SGA in
+Sec. III, the improvement of M1GA and M2GA is significant
+though it might not be sufficient for practical applications.
+However, using MCTAs these numbers drastically decrease to
+about 424 000 and 568 000 for M1GAA and M2GAA, respectively, comparable to 484 000 in the case of the SGAA. Thus,
+one could expect a huge reduction of noise in the circuits using
+MCTAs, as was already shown in Sec. III for the SGA.
+Having in mind the correlation of the number of gates and
+the selection thresholds for the error probabilities, found in
+Sec. III, we apply the functional forms used for the number
+of gates to fit the error thresholds versus the number of qubits
+for the MGA circuits. Tables SIV and SV in the Supplemental
+Material [11] show the fitting coefficients in all cases. The
+calculated data for the selectivity thresholds as well as the
+fitting curves are shown in Fig. 4 and extrapolated to 15 qubits.
+Like in the SGA cases of Fig. 2, by setting the threshold of
+
+errors to 10−4 it follows that M2GA can perform a successful
+search with data sets of up to 28 in size. Similar results are
+obtained for M1GA and presented in Fig. S3 of the Supplemental Material [11]. Most error threshold upper bounds are
+below that limit with a 10-qubit search. However, with the
+use of MCTAs this data size limit extends to 212 and 214 for
+M1GAA and M2GAA, respectively.
+We also investigate the effect of decoherence by tuning
+T1 and T2 , like in Sec. III. Data points with a selectivity in
+the range 2.5 to 3.5 are collected and plotted in Fig. 5 for
+the two-stage depth-reduced method [12]. Similar results for
+M1GA and M1GAA are calculated and shown in Fig. S4 of
+the Supplemental Material [11]. The thresholds T1 and T2 for 4
+qubits are as low as 15 and 15 μs with M2GA, but for 8 qubits
+with M2GA, the averages of T1 and T2 decrease to 500 and 350
+μs from 1159 and 330 μs with the SGA. Use of MCTAs helps
+to further reduce the threshold relaxation times. The coherent
+requirements for the selectivity with M2GAA yield average
+values for T1 and T2 of 110 and 45 μs, respectively (6 qubits),
+and 400 and 200 μs for T1 and T2 , respectively (8 qubits).
+For 10 qubits, a successful GA can be achieved by M2GAA
+with an average of 600 and 800 μs for T1 and T2 , respectively,
+which is about 3 times shorter for T1 and about 20% for T2
+from the SGAA in Sec. III.
+V. COMPARISON AND DISCUSSION OF THE RESULTS
+
+Comparisons of the selectivity thresholds for the error
+probabilities of the various types of error, obtained with algorithms in Secs. III and IV for 4–10 qubits as well as for
+the extrapolations to 15 qubits, are presented in Figs. 6(a)
+(4–8 qubits) and 6(b) (10 and 15 qubits). Due to the presence
+of quantum noise, the measured probability of the targeted
+state for a large number of qubits is at a low value. However,
+the targeted data are still selective and can be distinguished
+from other data. For example, in the 10-qubit M1GA with
+depolarizing noise (Fig. S5 of the Supplemental Material
+[11]), probabilities of the targeted data are about a factor of
+2 larger than the highest noise signal, and about 2 orders
+of magnitude higher than most of the noise signals, which
+ensures a successful Grover’s search. With 4 qubits, SGA,
+
+042609-5
+
+YULUN WANG AND PREDRAG S. KRSTIC
+
+PHYSICAL REVIEW A 102, 042609 (2020)
+
+FIG. 6. Comparison of the selectivity thresholds due to various quantum circuits errors in the standard GA (SGA and SGAA
+when MCTA are used), the one-stage depth-reduced GA (M1GA
+and M1GAA), and the two-stage depth-reduced GA (M2GA and
+M2GAA) for (a) 4, 6, and 8 qubits and (b) 10 and 15 qubits. The
+15-qubit case was obtained by extrapolation of the fitting curves in
+Secs. III and IV. Higher-resolution figures are presented in Fig. S6
+of the Supplemental Material [11].
+
+SGAA, and M1GA have very similar error thresholds with
+slightly bigger values of M1GA due to the depth reduction
+by using local diffusion operators. By applying MCTA in
+M1GA the selectivity thresholds are increased 1.5 (BF and
+PF) to 2 times (DEP, AD, and PD). This is not the case
+for M2GA when n = 4, which has similar error threshold
+values as M2GAA for all types, though slightly bigger than
+those of M1GAA. However, these relations for the selectivity
+thresholds are not kept when increasing the number of qubits.
+Thus, for 10 qubits, the SGAA is significantly more selective
+than both M1GA (10 times for AD, about 5 times for others)
+and M2GA and is quite close to the values of M1GAA for
+all error types. Only M2GAA is convincingly most selective,
+leading by about a factor of 2 over SGAA and M1GAA except
+for AD and PD error types where it is only slightly better.
+The trend of separation of the algorithms which use MCTAs
+from the algorithms with MCTs is continuing with further
+increase of the number of qubits by extrapolation of the fitting
+curves in Secs. III and IV (and Tables SII, SIV, and SV of
+the Supplemental Material [11]). Thus, with 15 qubits this
+separation reaches 2 orders of magnitude. In that case, the
+
+M2GA is up to a factor of 2 more selective than M1GA and
+2–4 times more selective than the SGA. The trend for relations
+of M2GAA with M1GAA and SGAA with 15 qubits is similar
+to that with 10 qubits.
+Among all gate errors, depolarization has the highest error threshold in all configurations and is expected to have
+the least impact to the selectivity of the results in the GA
+search. Similarly, the phase-damping error thresholds are significantly bigger than those with amplitude damping in all
+cases. Concerning the considered algorithms, the best results
+are obtained by two-stage algorithms, whether these are used
+with MCTs or MCTAs. Moreover, with MCTAs used in the
+quantum circuits, the decrease in the number of gates with
+the number of qubits changes from exponential dependence
+to the product of power and a weak exponential dependence.
+This leads to a huge improvement in the selectivity loss due
+to the noise in the circuit, qualifying M2GAA but also SGAA
+and M1GAA for a successful Grover’s search with 10 qubits
+if error probabilities are smaller than 10−4 , i.e., with 15 qubits
+when the error probabilities are smaller than 10−5 .
+Therefore, using MCTAs in the quantum circuit in place
+of MCTs dramatically improves the noise resistance. Using
+MCTAs in GA is as effective as the use of local diffusion
+operators in reducing the effect of gate noise, as was done in
+Ref. [12]. From the discussion in Sec. IV, it follows also that
+the two-stage MGA contributes the most in the reduction of
+decoherence.
+Nevertheless, the two-stage depth optimization is not
+supported on current IBM quantum computers because no
+quantum operations are allowed in the circuits after a measurement (see Fig. S2(c) in Note SII of the Supplemental
+Material [11]). Another impediment for implementing the
+optimal configurations is that all simulations in this paper
+are based on the ideal assumption that all qubits are fully
+connected to each other, which is not true for the current
+superconducting quantum computers. Extra SWAP gates could
+be added to a circuit for adapting to the actual device topology which can dramatically increase the circuit depth after
+circuit transpiling to basis operations. Other computing platforms could be more successful in handling the quantum
+noise and thus implementing successfully larger numbers of
+qubits in Grover’s search in the near future. For example,
+the trapped-ion quantum computers are recognized to have
+an exceptionally long coherence time, very high fidelity of
+gate operations, state preparation and readout with a high
+fidelity, and full connectivity of qubits [26]. Besides, the
+symmetry features of a trapped-ion device allow for a more
+compact version of Grover’s search with smaller quantum
+depth [27].
+Another drawback in our work could be the way we applied
+the noise models: These are applied to all qubits in quantum
+operations in GA. This seems like overestimation of the noise
+reality. However, this approach could partially compensate for
+our treatment of the 2-qubit gates (2QGs). It is experimentally
+known that superconducting 2-qubit gates have significantly
+higher error probability than 1-qubit gates. In our model an
+error after a 2QG simply arises from the tensor product of
+the qubit’s states, which is likely underestimating the error
+of the 2QGs. For example, the number of 2QGs in both
+the 8-qubit SGA and SGAA circuits is very close to that of
+
+042609-6
+
+PROSPECT OF USING GROVER’S SEARCH IN THE …
+
+PHYSICAL REVIEW A 102, 042609 (2020)
+VI. CONCLUSIONS
+
+FIG. 7. Error threshold of BF, PF, DEP, AD, and PD with noise
+channels applied only on single qubit gates and 2-qubit gates for
+(a) the 8-qubit SGA and (b) the 8-qubit SGAA. Simulated results
+with only 1 noisy qubit are also shown, as well as contributions of all
+error channels.
+
+1-qubit gates. We show this by including only noisy 2-qubit
+gates in the SGA [Fig. 7(a)] and the SGAA [Fig. 7(b)]. We
+get a slightly lower error threshold than when including only
+noisy single-qubit gates, indicating that in our model 2-qubit
+operations contribute only slightly more to a final noise of the
+GA circuits. Another simplifying assumption is that all qubits
+are equally susceptible to errors, which is certainly not true in
+the real superconducting computers. We also test application
+of noise to only 1 qubit. This gives, in the 8-qubit case for the
+SGA, an error threshold about an order of magnitude higher
+(20–60 times for the SGAA) than that for all qubits’ GA
+operations.
+
+[1] L. K. Grover, Quantum Mechanics Helps in Searching for a
+Needle in a Haystack, Phys. Rev. Lett. 79, 325 (1997).
+[2] M. Boyer, G. Brassard, P. Høyer, and A. Tapp, Tight bounds on
+quantum searching, Fortschr. Phys. 46, 493 (1998).
+[3] C. Zalka, Grover’s quantum searching algorithm is optimal,
+Phys. Rev. A 60, 2746 (1999).
+[4] J. Preskill, Quantum computing in the NISQ era and beyond,
+Quantum 2, 79 (2018).
+[5] D. Reitzner and M. Hillery, Grover search under localized dephasing, Phys. Rev. A 99, 012339 (2019).
+
+We undertake a series of computer simulations of Grover’s
+search by applying the noise, modeled in the IBM QISKIT.
+We apply three forms of Grover’s algorithm: (i) the standard
+one, with 4–10 qubits; (ii) a recently published modified
+Grover’s algorithm [12], set to reduce the circuit depth; and
+(iii) the algorithms in (i) and (ii) with multicontrol Toffoli’s
+gates modified by the addition of an ancilla qubit (MCTAs).
+The noise and errors included are the bit and phase flips,
+depolarization, amplitude and phase damping, and the energy
+and phase relaxation times, determining the system coherence
+time. The circuits with MCTAs in all cases show a significant
+improvement of the selectivity thresholds for the error probabilities, which goes up to 1 order of magnitude for a 10-qubit
+algorithm, and even more for larger numbers of qubits. This
+is explained by the exponential growth with the number of
+qubits n when MTAs are used, which transforms into the
+combination of a power law and weak exponential growth,
+when MCTAs are utilized. These result in similar functional
+dependencies on n (with flipped sign of both the exponents
+and the powers) for the selectivity thresholds due to the errors.
+The depth-modified Grover’s algorithm shows an increase of
+the error thresholds and a decrease of threshold relaxation
+times, which are also notably improved by the use of MCTAs.
+By extrapolation of the fitted functional dependencies to n as
+large as 15, we also provide predictions of the error thresholds
+for successful search with all studied quantum circuit configurations, which set the limit for errors probabilities to 10−5 for
+successful search of databases as large as 32 000. While these
+errors might be beyond anticipated hardware possibilities, the
+error limit of 10−4 seems to be applicable in the near future for
+a GA search with 10 qubits, i.e., for a data set as large as 1000.
+ACKNOWLEDGMENTS
+
+The authors acknowledge financial support from the Institute for Advanced Computational Science at Stony Brook
+University. We would like to thank Stony Brook Research
+Computing and Cyberinfrastructure, and the Institute for Advanced Computational Science at Stony Brook University for
+access to the high-performance SeaWulf computing system,
+which was made possible by National Science Foundation
+Grant No. 1531492. The authors are grateful to Kun Zhang
+and Vladimir Korepin for the inspiring discussions.
+
+[6] D. D. Bhaktavatsala Rao and K. Mølmer, Effect of qubit
+losses on Grover’s quantum search algorithm, Phys. Rev. A 86,
+042321 (2012).
+[7] B. Pablo-Norman and M. Ruiz-Altaba, Noise in Grover’s quantum search algorithm, Phys. Rev. A 61, 012301 (1999).
+[8] D. Shapira, S. Mozes, and O. Biham, Effect of unitary noise on
+Grover’s quantum search algorithm, Phys. Rev. A 67, 042301
+(2003).
+[9] P. J. Salas, Noise effect on Grover algorithm, Eur. Phys. J. D 46,
+365 (2008).
+
+042609-7
+
+YULUN WANG AND PREDRAG S. KRSTIC
+
+PHYSICAL REVIEW A 102, 042609 (2020)
+
+[10] G. L. Long, Grover algorithm with zero theoretical failure rate,
+Phys. Rev. A 64, 022307 (2001).
+[11] See Supplemental Material at http://link.aps.org/supplemental/
+10.1103/PhysRevA.102.042609 for further details about depth
+of Grover’s algorithm circuit, schematics of the GA quantum
+circuits, selectivity thresholds for error probabilities and thermal relaxation times for M1GA and M1GAA, examples of
+10-qubit M1GA results with depolarizing error, comparison
+of all tested results and fitting parameters for the selectivity
+threshold of various types of error.
+[12] K. Zhang and V. E. Korepin, Depth optimization of quantum
+search algorithms beyond Grover’s algorithm, Phys. Rev. A
+101, 032346 (2020).
+[13] G. Aleksandrowicz et al., Qiskit: An open-source framework
+for quantum computing (2019), https://doi.org/10.5281/zenodo.
+2562111.
+[14] A. Barenco, C. H. Bennett, R. Cleve, D. P. DiVincenzo, N.
+Margolus, P. Shor, T. Sleator, J. A. Smolin, and H. Weinfurter,
+Elementary gates for quantum computation, Phys. Rev. A 52,
+3457 (1995).
+[15] S. S. Tannu and M. K. Qureshi, Not all qubits are created equal: A case for variability-aware policies for NISQ-era
+quantum computers, in Proceedings of the Twenty-Fourth
+International Conference on Architectural Support for Programming Languages and Operating Systems, ASPLOS’19
+(Association for Computing Machinery, New York, 2019),
+pp. 987–999.
+[16] E. Knill, D. Leibfried, R. Reichle, J. Britton, R. B. Blakestad,
+J. D. Jost, C. Langer, R. Ozeri, S. Seidelin, and D. J. Wineland,
+Randomized benchmarking of quantum gates, Phys. Rev. A 77,
+012307 (2008).
+
+[17] M. A. Nielsen and I. L. Chuang, Quantum Computation and
+Quantum Information, 10th anniversary ed. (Cambridge University, New York, 2011).
+[18] M. Gutiérrez, L. Svec, A. Vargo, and K. R. Brown, Approximation of realistic errors by Clifford channels and Pauli
+measurements, Phys. Rev. A 87, 030302(R) (2013).
+[19] J. Preskill, Lecture notes for Ph219/CS219: Quantum information, Chap. 3 (2018), http://theory.caltech.edu/∼preskill/ph229/
+notes/chap3.pdf.
+[20] M. Grifoni, E. Paladino, and U. Weiss, Dissipation, decoherence and preparation effects in the spin-boson system, Eur.
+Phys. J. B 10, 719 (1999).
+[21] Y. Yafet, in Solid State Physics, edited by F. Seitz and D.
+Turnbull (Academic, New York, 1963), p. 2, Vol. 14.
+[22] C. Blank, D. K. Park, J.-K. K. Rhee, and F. Petruccione, Quantum classifier with tailored quantum kernel, npj Quantum Inf.
+6, 41 (2020).
+[23] A. Younes, Towards more reliable fixed phase quantum search
+algorithm, Appl. Math. Inf. Sci. 7, 93 (2013).
+[24] C. Figgatt, D. Maslov, K. A. Landsman, N. M. Linke, S.
+Debnath, and C. Monroe, Complete 3-qubit Grover search on
+a programmable quantum computer, Nat. Commun. 8, 1918
+(2017).
+[25] High-performance Seawulf computing system, https://iacs.
+stonybrook.edu/resources/seawulf-clusters.
+[26] C. D. Bruzewicz, J. Chiaverini, R. McConnell, and J. M.
+Sage, Trapped-ion quantum computing: Progress and challenges, Appl. Phys. Rev. 6, 021314 (2019).
+[27] S. S. Ivanov, P. A. Ivanov, I. E. Linington, and N. V. Vitanov,
+Scalable quantum search using trapped ions, Phys. Rev. A 81,
+042328 (2010).
+
+042609-8
+
+

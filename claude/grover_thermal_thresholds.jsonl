@@ -1,0 +1,24 @@
+{"n_qubits": 4, "algorithm": "SGA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 4, "algorithm": "SGAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 4, "algorithm": "M1GA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 4, "algorithm": "M1GAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 4, "algorithm": "M2GA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 4, "algorithm": "M2GAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 6, "algorithm": "SGA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 6, "algorithm": "SGAA", "t1_us_avg": 10000.0, "t2_us_avg": 10.0, "accepted_points": [[10000.0, 10.0, 2.651630949094528]]}
+{"n_qubits": 6, "algorithm": "M1GA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 6, "algorithm": "M1GAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 6, "algorithm": "M2GA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 6, "algorithm": "M2GAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 8, "algorithm": "SGA", "t1_us_avg": 215.44346900318823, "t2_us_avg": 464.15888336127773, "accepted_points": [[215.44346900318823, 464.15888336127773, 3.474873969029826]]}
+{"n_qubits": 8, "algorithm": "SGAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 8, "algorithm": "M1GA", "t1_us_avg": 7320.794416806389, "t2_us_avg": 339.801176182233, "accepted_points": [[4641.588833612777, 464.15888336127773, 2.808266095756942], [10000.0, 215.44346900318823, 2.5105602070214257]]}
+{"n_qubits": 8, "algorithm": "M1GAA", "t1_us_avg": 3398.01176182233, "t2_us_avg": 157.7217345015941, "accepted_points": [[2154.4346900318824, 215.44346900318823, 2.5756430188289086], [4641.588833612777, 100.0, 2.5756430188289086]]}
+{"n_qubits": 8, "algorithm": "M2GA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 8, "algorithm": "M2GAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 10, "algorithm": "SGA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 10, "algorithm": "SGAA", "t1_us_avg": 100.0, "t2_us_avg": 10000.0, "accepted_points": [[100.0, 10000.0, 3.2735893438633044]]}
+{"n_qubits": 10, "algorithm": "M1GA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 10, "algorithm": "M1GAA", "t1_us_avg": null, "t2_us_avg": null, "accepted_points": []}
+{"n_qubits": 10, "algorithm": "M2GA", "t1_us_avg": 21.544346900318832, "t2_us_avg": 1127.2173450159412, "accepted_points": [[21.544346900318832, 100.0, 3.452336581560348], [21.544346900318832, 2154.4346900318824, 3.452336581560347]]}
+{"n_qubits": 10, "algorithm": "M2GAA", "t1_us_avg": 12.308869380063765, "t2_us_avg": 2485.2588094742396, "accepted_points": [[10.0, 46.41588833612777, 3.1315062833983465], [10.0, 215.44346900318823, 3.4606785974367584], [10.0, 2154.4346900318824, 2.7734666722318897], [10.0, 10000.0, 3.046949497503866], [21.544346900318832, 10.0, 2.58021213531457]]}
