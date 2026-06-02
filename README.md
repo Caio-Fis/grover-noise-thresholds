@@ -43,6 +43,58 @@ mínimo de coerência (`T1`/`T2`) necessário para manter `S ≥ 3.0 dB`.
 
 ---
 
+## Resultados principais
+
+Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston.
+
+- **Vantagem exponencial do Grover de 2 estágios (M2GA / M2GAA).** A exigência de
+  coerência térmica em relação ao Grover padrão cai de ~12× (4 qubits) para
+  **120–130× (10 qubits)**, reduzindo o `T1`/`T2` necessário de mais de 10 ms para
+  apenas ~76–84 µs.
+- **Viabilidade no Heron r2.** Com coerência física típica de 250–300 µs, o Grover
+  padrão (SGA) é inviável a partir de 8 qubits (>2,4 ms exigidos), enquanto a família
+  M2GA opera dentro da zona de segurança física, com margens de 3× a 11× a 10 qubits.
+- **Robustez a ruído de porta.** A 4 qubits, o M2GA tolera ~4,5% de erro de
+  depolarização, contra apenas ~0,30% do SGA.
+
+> **Nota.** As pequenas flutuações nos algoritmos locais (`M1GA`/`M1GAA`) decorrem da
+> natureza estocástica das simulações Monte Carlo sob `SHOTS` finitos.
+
+### Visualização dos Resultados
+
+As figuras a seguir foram geradas a partir dos dados consolidados na pasta `data/` usando o script `src/plot_results.py`:
+
+#### Perfil IBM Fez (`ibm_fez_2026`)
+* **Seletividade vs. Taxa de Erro (8 Qubits)**
+  ![Curvas de Seletividade - IBM Fez](figures/selectivity_curves_ibm_fez_2026.png)
+* **Limiares de Erro de Porta (4 Qubits)**
+  ![Limiares de Erro - IBM Fez](figures/gate_thresholds_ibm_fez_2026.png)
+* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
+  ![Escalonamento Térmico - IBM Fez](figures/thermal_scaling_ibm_fez_2026.png)
+
+#### Perfil IBM Kingston (`ibm_kingston_2026`)
+* **Seletividade vs. Taxa de Erro (8 Qubits)**
+  ![Curvas de Seletividade - IBM Kingston](figures/selectivity_curves_ibm_kingston_2026.png)
+* **Limiares de Erro de Porta (4 Qubits)**
+  ![Limiares de Erro - IBM Kingston](figures/gate_thresholds_ibm_kingston_2026.png)
+* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
+  ![Escalonamento Térmico - IBM Kingston](figures/thermal_scaling_ibm_kingston_2026.png)
+
+---
+
+## Formato dos dados (`data/`)
+
+Para cada perfil (`ibm_fez_2026`, `ibm_kingston_2026`) há arquivos de duas famílias:
+
+- `grover_thresholds_<perfil>.{jsonl,json,append.csv}` — limiares de erro de porta.
+- `grover_thermal_thresholds_<perfil>.{jsonl,json}` — limiares térmicos (`T1`/`T2`).
+
+Os `.jsonl` são append-only (um registro por configuração, robustos a interrupções em
+execuções longas) e os `.json` são as versões consolidadas e ordenadas geradas pelo
+pós-processamento.
+
+---
+
 ## Estrutura do repositório
 
 ```
@@ -115,58 +167,6 @@ O `grover_paper_hardware.py` submete circuitos a uma QPU real da IBM Quantum. O 
 # Token em ~/.config/ibm_quantum/token (padrão)
 python src/grover_paper_hardware.py --backend ibm_fez
 ```
-
----
-
-## Resultados principais
-
-Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston.
-
-- **Vantagem exponencial do Grover de 2 estágios (M2GA / M2GAA).** A exigência de
-  coerência térmica em relação ao Grover padrão cai de ~12× (4 qubits) para
-  **120–130× (10 qubits)**, reduzindo o `T1`/`T2` necessário de mais de 10 ms para
-  apenas ~76–84 µs.
-- **Viabilidade no Heron r2.** Com coerência física típica de 250–300 µs, o Grover
-  padrão (SGA) é inviável a partir de 8 qubits (>2,4 ms exigidos), enquanto a família
-  M2GA opera dentro da zona de segurança física, com margens de 3× a 11× a 10 qubits.
-- **Robustez a ruído de porta.** A 4 qubits, o M2GA tolera ~4,5% de erro de
-  depolarização, contra apenas ~0,30% do SGA.
-
-> **Nota.** As pequenas flutuações nos algoritmos locais (`M1GA`/`M1GAA`) decorrem da
-> natureza estocástica das simulações Monte Carlo sob `SHOTS` finitos.
-
-### Visualização dos Resultados
-
-As figuras a seguir foram geradas a partir dos dados consolidados na pasta `data/` usando o script `src/plot_results.py`:
-
-#### Perfil IBM Fez (`ibm_fez_2026`)
-* **Seletividade vs. Taxa de Erro (8 Qubits)**
-  ![Curvas de Seletividade - IBM Fez](figures/selectivity_curves_ibm_fez_2026.png)
-* **Limiares de Erro de Porta (4 Qubits)**
-  ![Limiares de Erro - IBM Fez](figures/gate_thresholds_ibm_fez_2026.png)
-* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
-  ![Escalonamento Térmico - IBM Fez](figures/thermal_scaling_ibm_fez_2026.png)
-
-#### Perfil IBM Kingston (`ibm_kingston_2026`)
-* **Seletividade vs. Taxa de Erro (8 Qubits)**
-  ![Curvas de Seletividade - IBM Kingston](figures/selectivity_curves_ibm_kingston_2026.png)
-* **Limiares de Erro de Porta (4 Qubits)**
-  ![Limiares de Erro - IBM Kingston](figures/gate_thresholds_ibm_kingston_2026.png)
-* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
-  ![Escalonamento Térmico - IBM Kingston](figures/thermal_scaling_ibm_kingston_2026.png)
-
----
-
-## Formato dos dados (`data/`)
-
-Para cada perfil (`ibm_fez_2026`, `ibm_kingston_2026`) há arquivos de duas famílias:
-
-- `grover_thresholds_<perfil>.{jsonl,json,append.csv}` — limiares de erro de porta.
-- `grover_thermal_thresholds_<perfil>.{jsonl,json}` — limiares térmicos (`T1`/`T2`).
-
-Os `.jsonl` são append-only (um registro por configuração, robustos a interrupções em
-execuções longas) e os `.json` são as versões consolidadas e ordenadas geradas pelo
-pós-processamento.
 
 ---
 
