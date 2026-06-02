@@ -108,17 +108,33 @@ def fig_gate_thresholds(gate_records, profile, n_qubits):
 
     for i, algo in enumerate(ALGO_ORDER):
         vals = []
+        is_hyper_robust = []
         for err in ERR_ORDER:
             rec = idx.get((n_qubits, algo, err))
             tp = rec.get("threshold_prob") if rec else None
-            vals.append((tp * 100.0) if tp is not None else 0.0)
-        ax.bar(x + i * width, vals, width, label=algo, color=ALGO_COLOR[algo])
+            if tp is not None:
+                vals.append(tp * 100.0)
+                is_hyper_robust.append(False)
+            else:
+                # Se for None, o algoritmo se manteve S >= 3dB em toda a varredura (até 10%)
+                vals.append(10.0)
+                is_hyper_robust.append(True)
+        bars = ax.bar(x + i * width, vals, width, label=algo, color=ALGO_COLOR[algo])
+        
+        # Adiciona um rótulo indicativo sobre a barra para algoritmos hiper-robustos (>=10%)
+        for bar, hyper in zip(bars, is_hyper_robust):
+            if hyper:
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width()/2., height + 0.15,
+                        '>10%', ha='center', va='bottom', fontsize=7.5,
+                        fontweight='bold', color=ALGO_COLOR[algo], rotation=0)
 
     ax.set_xticks(x + 0.4 - width / 2)
     ax.set_xticklabels([f"{ERR_LABEL[e]}\n({e})" for e in ERR_ORDER])
     ax.set_ylabel("Limiar de erro de porta (%)  —  maior é mais robusto")
     ax.set_title(f"Limiares de erro de porta por algoritmo — {n_qubits} qubits ({profile})",
                  fontsize=14, fontweight="bold")
+    ax.set_ylim(0, 11.5)  # Ajusta o limite superior para dar espaço ao rótulo '>10%'
     ax.legend(title="Algoritmo", ncol=3)
     ax.grid(True, axis="y", ls=":", alpha=0.4)
     fig.tight_layout()
