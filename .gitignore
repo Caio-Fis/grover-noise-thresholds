@@ -21,3 +21,6 @@ tasks/
 *.pdf
 physreva_*.txt
 paper.txt
+
+# Local docs / templates generated during implementation
+docs/

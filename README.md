@@ -52,9 +52,10 @@ mínimo de coerência (`T1`/`T2`) necessário para manter `S ≥ 3.0 dB`.
 │   ├── grover_paper_hardware.py # Execução em hardware real da IBM Quantum
 │   ├── grover_origin.py         # Análise de limiar original do projeto
 │   ├── run_experimentos.py      # Orquestrador multi-QPU (Fez + Kingston, com checkpoints)
-│   └── merge_results.py         # Pós-processamento e consolidação de resultados
+│   ├── merge_results.py         # Pós-processamento e consolidação de resultados
+│   └── plot_results.py          # Geração das figuras a partir dos dados consolidados
 ├── data/                    # Resultados (JSON / JSONL / CSV) por perfil de hardware
-├── docs/                    # Walkthrough, plano de implementação e relatórios de análise
+├── figures/                 # Figuras e gráficos gerados (PNG)
 ├── notebooks/               # Notebooks exploratórios
 ├── requirements.txt
 └── README.md
@@ -119,8 +120,7 @@ python src/grover_paper_hardware.py --backend ibm_fez
 
 ## Resultados principais
 
-Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston. Detalhes completos,
-tabelas por número de qubits e gráficos em [`docs/walkthrough.md`](docs/walkthrough.md).
+Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston.
 
 - **Vantagem exponencial do Grover de 2 estágios (M2GA / M2GAA).** A exigência de
   coerência térmica em relação ao Grover padrão cai de ~12× (4 qubits) para
@@ -134,6 +134,26 @@ tabelas por número de qubits e gráficos em [`docs/walkthrough.md`](docs/walkth
 
 > **Nota.** As pequenas flutuações nos algoritmos locais (`M1GA`/`M1GAA`) decorrem da
 > natureza estocástica das simulações Monte Carlo sob `SHOTS` finitos.
+
+### Visualização dos Resultados
+
+As figuras a seguir foram geradas a partir dos dados consolidados na pasta `data/` usando o script `src/plot_results.py`:
+
+#### Perfil IBM Fez (`ibm_fez_2026`)
+* **Seletividade vs. Taxa de Erro (8 Qubits)**
+  ![Curvas de Seletividade - IBM Fez](figures/selectivity_curves_ibm_fez_2026.png)
+* **Limiares de Erro de Porta (4 Qubits)**
+  ![Limiares de Erro - IBM Fez](figures/gate_thresholds_ibm_fez_2026.png)
+* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
+  ![Escalonamento Térmico - IBM Fez](figures/thermal_scaling_ibm_fez_2026.png)
+
+#### Perfil IBM Kingston (`ibm_kingston_2026`)
+* **Seletividade vs. Taxa de Erro (8 Qubits)**
+  ![Curvas de Seletividade - IBM Kingston](figures/selectivity_curves_ibm_kingston_2026.png)
+* **Limiares de Erro de Porta (4 Qubits)**
+  ![Limiares de Erro - IBM Kingston](figures/gate_thresholds_ibm_kingston_2026.png)
+* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
+  ![Escalonamento Térmico - IBM Kingston](figures/thermal_scaling_ibm_kingston_2026.png)
 
 ---
 
