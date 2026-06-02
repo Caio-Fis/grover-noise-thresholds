@@ -1,6 +1,11 @@
 import json
 import os
 
+# Resolve all relative data paths to the repository's data/ directory.
+_SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(os.path.dirname(_SRC_DIR), "data")
+
+
 def load_json(path):
     if not os.path.exists(path):
         print(f"File {path} does not exist. Returning empty list.")
@@ -115,7 +120,7 @@ def merge_thermal_thresholds(json_path, jsonl_path, output_path):
     print(f"Saved merged thermal thresholds to {output_path}")
 
 if __name__ == "__main__":
-    workspace_dir = "/home/crus/Documents/Projetos/Grover/antigravity"
+    workspace_dir = DATA_DIR
     
     # Merge standard thresholds
     t_json = os.path.join(workspace_dir, "grover_thresholds.json")

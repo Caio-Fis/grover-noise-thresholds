@@ -1,11 +1,23 @@
-.venv/
-antigravity/.venv/
-claude/.venv/
+# Python
 __pycache__/
-**/__pycache__/
-.ipynb_checkpoints/
-**/.ipynb_checkpoints/
 *.pyc
-**/*.pyc
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temp files
 *.tmp
-**/*.tmp
+
+# Local task tracking
+tasks/
+
+# Copyrighted reference paper — cite via DOI instead (Phys. Rev. A 102, 042609)
+*.pdf
+physreva_*.txt
+paper.txt

@@ -10,6 +10,15 @@ import json
 import argparse
 import subprocess
 
+# Resolve all relative data paths to the repository's data/ directory,
+# so the orchestrator can be launched from anywhere. The simulation script
+# lives in this same src/ directory and is invoked by absolute path below.
+_SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(os.path.dirname(_SRC_DIR), "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+os.chdir(DATA_DIR)
+
+
 def load_jsonl(path):
     if not os.path.exists(path):
         return []
@@ -71,7 +80,7 @@ def consolidate_fez_thermal_checkpoints():
 
 def run_repro_script(profile, qubits, run_flags=None):
     """Invoca o script grover_paper_repro.py usando subprocess com saída unbuffered."""
-    cmd = [sys.executable, "-u", "grover_paper_repro.py", "--profile", profile, "--qubits", qubits]
+    cmd = [sys.executable, "-u", os.path.join(_SRC_DIR, "grover_paper_repro.py"), "--profile", profile, "--qubits", qubits]
     if run_flags:
         cmd.extend(run_flags)
         

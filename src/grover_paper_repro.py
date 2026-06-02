@@ -45,6 +45,13 @@ from qiskit.transpiler.passes.synthesis.high_level_synthesis import HLSConfig
 # Global config (tune as needed)
 # -----------------------------
 
+# Resolve all relative data paths to the repository's data/ directory,
+# so the script can be launched from anywhere.
+_SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(os.path.dirname(_SRC_DIR), "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+os.chdir(DATA_DIR)
+
 # Choose Active Hardware Profile
 # Options: "ibmq_cambridge_2020", "ibm_fez_2026", "ibm_kingston_2026"
 ACTIVE_PROFILE = "ibm_fez_2026"

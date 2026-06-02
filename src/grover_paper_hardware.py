@@ -28,6 +28,14 @@ from qiskit_ibm_runtime import QiskitRuntimeService, Sampler
 from qiskit.transpiler.passes.synthesis.high_level_synthesis import HLSConfig
 
 
+# Resolve all relative data paths to the repository's data/ directory,
+# so the script can be launched from anywhere.
+_SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(os.path.dirname(_SRC_DIR), "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+os.chdir(DATA_DIR)
+
+
 @dataclass(frozen=True)
 class AlgorithmSpec:
     name: str

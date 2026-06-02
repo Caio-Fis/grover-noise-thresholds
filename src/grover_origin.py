@@ -5,6 +5,7 @@ Algoritmo de Grover - Análise de Limiar de Ruído (Threshold Analysis)
 Baseado em: Phys. Rev. A 102, 042609 (2020)
 """
 
+import os
 import math
 import numpy as np
 import json
@@ -21,6 +22,13 @@ from qiskit_ibm_runtime import QiskitRuntimeService, SamplerV2 as Sampler
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit_aer.noise import NoiseModel, depolarizing_error, thermal_relaxation_error, pauli_error, ReadoutError
 import matplotlib.pyplot as plt
+
+# Resolve all relative data paths to the repository's data/ directory,
+# so the script can be launched from anywhere.
+_SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(os.path.dirname(_SRC_DIR), "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+os.chdir(DATA_DIR)
 
 # Suprimir warnings
 warnings.filterwarnings('ignore', category=DeprecationWarning)
