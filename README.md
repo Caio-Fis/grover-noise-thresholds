@@ -64,41 +64,32 @@ Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston.
 
 As figuras a seguir foram geradas a partir dos dados consolidados na pasta `data/` usando o script `src/plot_results.py`.
 
-#### Guia Didático de Interpretação dos Gráficos
+#### 1. Curvas de Seletividade vs. Taxa de Erro (8 Qubits)
+Esta figura demonstra a degradação da seletividade do algoritmo ($S$ em dB) conforme a probabilidade de erro de porta ($p$) cresce, sob os 5 canais de ruído avaliados. A linha horizontal tracejada preta marca o limiar de sucesso crítico de **$S = 3.0\text{ dB}$**. O ponto exato onde a curva de um algoritmo intercepta essa linha indica a sua taxa limite de ruído tolerada; curvas que se mantêm acima e à direita por mais tempo representam algoritmos mais robustos. Fica nítido o rápido colapso dos algoritmos tradicionais (`SGA` e `SGAA`) em 8 qubits, enquanto a família de dois estágios (`M2GA`/`M2GAA`) mantém seletividade excelente até em taxas de ruído severas.
 
-Para facilitar a análise dos dados científicos apresentados, cada uma das três figuras geradas deve ser interpretada da seguinte maneira:
-
-1. **Curvas de Seletividade vs. Taxa de Erro (8 Qubits)**
-   * **O que representa:** Demonstra a degradação da seletividade do algoritmo ($S$ em dB) conforme a probabilidade de erro de porta ($p$) cresce, sob os 5 canais de ruído avaliados.
-   * **Como ler:** A linha horizontal tracejada preta marca o limiar de sucesso crítico de **$S = 3.0\text{ dB}$**. O ponto exato onde a curva de um algoritmo intercepta essa linha indica a sua taxa limite de ruído tolerada. **Curvas que se mantêm acima e à direita por mais tempo representam algoritmos mais robustos**.
-   * **Visão Física:** Fica visível o rápido colapso dos algoritmos tradicionais (`SGA` e `SGAA`) em 8 qubits, enquanto a família de dois estágios (`M2GA`/`M2GAA`) mantém seletividade excelente até em taxas de ruído severas.
-
-2. **Limiares de Erro de Porta por Algoritmo (4 Qubits)**
-   * **O que representa:** Mapeia a taxa máxima tolerável de ruído de porta (em %) antes que o algoritmo falhe (ou seja, quando $S$ desce abaixo de $3.0\text{ dB}$).
-   * **Como ler:** Cada bloco de barras coloridas representa um tipo de ruído. **Quanto mais alta a barra, mais robusto é o algoritmo**. Rótulos de texto indicam o valor percentual exato acima de cada barra.
-   * **Visão Física:** Evidencia a robustez monumental dos algoritmos locais de dois estágios. A família `M2GA`/`M2GAA` atinge limiares reais de **$12.4\% - 13.0\%$** em Amplitude Damping (AD) e de **$49.9\% - 50.4\%$** em Phase Damping (PD) (indicados com asterisco e limitados visualmente a $15.0\%$ no gráfico para não achatar e ocultar as demais colunas).
-
-3. **Escalonamento do Limiar Térmico de Coerência vs. Qubits (4 a 10 Qubits)**
-   * **O que representa:** Indica o tempo mínimo de coerência térmica ($T_1$/$T_2$ em $\mu s$, escala logarítmica) que o hardware físico deve possuir para garantir a execução bem-sucedida do Grover à medida que o circuito escala em tamanho.
-   * **Como ler:** O eixo horizontal indica o número de qubits, e o eixo vertical (escala logarítmica) é o tempo mínimo de coerência térmica exigido. **Curvas localizadas mais abaixo no gráfico indicam algoritmos mais viáveis**, pois demandam menos coerência do hardware. A área cinza tracejada representa a janela física real oferecida pelas QPUs IBM Heron r2 ($250 - 300\ \mu s$).
-   * **Visão Física:** À medida que escalamos para 10 qubits, o Grover tradicional (`SGA`) exige tempos de coerência impraticáveis na escala de dezenas de milissegundos. Já as variantes locais (`M2GA`/`M2GAA`) demandam menos de $84\ \mu s$, mantendo-se folgadamente abaixo da linha física real (zona segura de operação das QPUs IBM Fez e Kingston).
+* **Perfil IBM Fez (`ibm_fez_2026`):**
+  ![Curvas de Seletividade - IBM Fez](figures/selectivity_curves_ibm_fez_2026.png)
+* **Perfil IBM Kingston (`ibm_kingston_2026`):**
+  ![Curvas de Seletividade - IBM Kingston](figures/selectivity_curves_ibm_kingston_2026.png)
 
 ---
 
-#### Gráficos do Perfil IBM Fez (`ibm_fez_2026`)
-* **Seletividade vs. Taxa de Erro (8 Qubits)**
-  ![Curvas de Seletividade - IBM Fez](figures/selectivity_curves_ibm_fez_2026.png)
-* **Limiares de Erro de Porta (4 Qubits)**
-  ![Limiares de Erro - IBM Fez](figures/gate_thresholds_ibm_fez_2026.png)
-* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
-  ![Escalonamento Térmico - IBM Fez](figures/thermal_scaling_ibm_fez_2026.png)
+#### 2. Limiares de Erro de Porta por Algoritmo (4 Qubits)
+Esta figura mapeia a taxa máxima tolerável de ruído de porta (em %) antes que o algoritmo falhe (ou seja, quando $S$ desce abaixo de $3.0\text{ dB}$). Cada bloco de barras coloridas representa um tipo de ruído, de modo que barras mais altas indicam algoritmos mais robustos. Os rótulos de texto no topo indicam o valor percentual exato. Os dados evidenciam a robustez monumental dos algoritmos locais de dois estágios: a família `M2GA`/`M2GAA` atinge limiares reais de **$12.4\% - 13.0\%$** em Amplitude Damping (AD) e de **$49.9\% - 50.4\%$** em Phase Damping (PD) (indicados com asterisco e limitados visualmente a $15.0\%$ no gráfico para preservar a escala visual do restante do gráfico).
 
-#### Gráficos do Perfil IBM Kingston (`ibm_kingston_2026`)
-* **Seletividade vs. Taxa de Erro (8 Qubits)**
-  ![Curvas de Seletividade - IBM Kingston](figures/selectivity_curves_ibm_kingston_2026.png)
-* **Limiares de Erro de Porta (4 Qubits)**
+* **Perfil IBM Fez (`ibm_fez_2026`):**
+  ![Limiares de Erro - IBM Fez](figures/gate_thresholds_ibm_fez_2026.png)
+* **Perfil IBM Kingston (`ibm_kingston_2026`):**
   ![Limiares de Erro - IBM Kingston](figures/gate_thresholds_ibm_kingston_2026.png)
-* **Escalonamento do Limiar Térmico (4 a 10 Qubits)**
+
+---
+
+#### 3. Escalonamento do Limiar Térmico de Coerência vs. Qubits (4 a 10 Qubits)
+Esta figura indica o tempo mínimo de coerência térmica ($T_1$/$T_2$ em $\mu s$, escala logarítmica) que o hardware físico deve possuir para garantir a execução bem-sucedida do Grover à medida que o circuito escala em tamanho. O eixo horizontal indica o número de qubits, e o eixo vertical é o tempo de coerência. Curvas localizadas mais abaixo no gráfico indicam algoritmos mais viáveis, pois demandam menos coerência do hardware. A área cinza tracejada representa a janela física real oferecida pelas QPUs IBM Heron r2 ($250 - 300\ \mu s$). À medida que escalamos para 10 qubits, o Grover tradicional (`SGA`) exige tempos de coerência na escala de dezenas de milissegundos, ultrapassando os limites físicos do hardware moderno, enquanto as variantes locais (`M2GA`/`M2GAA`) demandam menos de $84\ \mu s$, operando de forma totalmente segura.
+
+* **Perfil IBM Fez (`ibm_fez_2026`):**
+  ![Escalonamento Térmico - IBM Fez](figures/thermal_scaling_ibm_fez_2026.png)
+* **Perfil IBM Kingston (`ibm_kingston_2026`):**
   ![Escalonamento Térmico - IBM Kingston](figures/thermal_scaling_ibm_kingston_2026.png)
 
 ---
