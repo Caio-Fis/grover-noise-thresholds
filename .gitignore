@@ -24,3 +24,6 @@ paper.txt
 
 # Local docs / templates generated during implementation
 docs/
+
+# Local scratch directories / scripts
+scratch/
