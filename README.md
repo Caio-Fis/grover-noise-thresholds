@@ -1,5 +1,10 @@
 # Grover sob Ruído: Limiares de Seletividade em Hardware NISQ
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Qiskit](https://img.shields.io/badge/Qiskit-2.3-6929C4.svg)](https://www.ibm.com/quantum/qiskit)
+[![DOI](https://img.shields.io/badge/DOI-10.1103%2FPhysRevA.102.042609-b31b1b.svg)](https://doi.org/10.1103/PhysRevA.102.042609)
+
 Reprodução e modernização do estudo de limiares de ruído do algoritmo de busca de
 Grover, baseado em:
 
