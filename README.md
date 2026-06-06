@@ -60,12 +60,26 @@ Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston.
 > **Nota.** As pequenas flutuações nos algoritmos locais (`M1GA`/`M1GAA`) decorrem da
 > natureza estocástica das simulações Monte Carlo sob `SHOTS` finitos.
 
+### Recursos de Circuito: Contagem de Portas CNOT
+Esta tabela apresenta o número total de portas CNOT (`cx`) executadas por cada algoritmo após a transpilação para a base nativa `["u", "cx"]`. Para os algoritmos locais de dois estágios (`M2GA`/`M2GAA`), indicamos a soma total e, entre parênteses, o número de portas em cada estágio executado de forma independente (`estágio 1 + estágio 2`):
+
+| Algoritmo | 4 Qubits | 6 Qubits | 8 Qubits | 10 Qubits |
+| :--- | :---: | :---: | :---: | :---: |
+| `SGA` | 84 | 1008 | 5280 | 22200 |
+| `SGAA` | 72 | 288 | 864 | 2400 |
+| `M1GA` | 45 | 540 | 2808 | 12000 |
+| `M1GAA` | 39 | 180 | 2622 | 11586 |
+| `M2GA` | 4 (2+2) | 48 (24+24) | 168 (84+84) | 576 (288+288) |
+| `M2GAA` | 4 (2+2) | 48 (24+24) | 144 (72+72) | 288 (144+144) |
+
+A redução monumental na quantidade de portas CNOT executadas pela família de dois estágios (`M2GA`/`M2GAA`) justifica diretamente a menor exigência de tempos de coerência térmica ($T_1$/$T_2$) e a maior robustez a erros de porta observada nos resultados.
+
 ### Visualização dos Resultados
 
 As figuras a seguir foram geradas a partir dos dados consolidados na pasta `data/` usando o script `src/plot_results.py`.
 
 #### 1. Curvas de Seletividade vs. Taxa de Erro (8 Qubits)
-Esta figura demonstra a degradação da seletividade do algoritmo ($S$ em dB) conforme a probabilidade de erro de porta ($p$) cresce, sob os 5 canais de ruído avaliados. A linha horizontal tracejada preta marca o limiar de sucesso crítico de **$S = 3.0\text{ dB}$**. O ponto exato onde a curva de um algoritmo intercepta essa linha indica a sua taxa limite de ruído tolerada; curvas que se mantêm acima e à direita por mais tempo representam algoritmos mais robustos. Fica nítido o rápido colapso dos algoritmos tradicionais (`SGA` e `SGAA`) em 8 qubits, enquanto a família de dois estágios (`M2GA`/`M2GAA`) mantém seletividade excelente até em taxas de ruído severas.
+Esta figura demonstra a degradação da seletividade do algoritmo ($S$ em dB) conforme a probabilidade de erro de porta ($p$) cresce, sob os 5 canais de ruído avaliados. A linha horizontal tracejada preta marca o limiar de sucesso crítico de **$S = 3.0\text{ dB}$**. O ponto exato onde a curva de um algoritmo intercepta essa linha indica a sua taxa limite de ruído tolerada; curvas que se mantêm acima e à direita por mais tempo representam algoritmos mais robustos. Fica nítido o rápido colapso dos algoritmos tradicionais (`SGA` e `SGAA`) em 8 qubits, enquanto a família de dois estágios (`M2GA`/`M2GAA`) mantém seletividade excelente até em taxas de ruído severas. As flutuações acentuadas observadas em alguns pontos das curvas decorrem do caráter estocástico da simulação de Monte Carlo sob um número finito de `SHOTS` (512) e `RUNS` (2) na base de dados anterior, gerando ruído estatístico de amostragem que é completamente eliminado na nova abordagem analítica via matriz de densidade.
 
 * **Perfil IBM Fez (`ibm_fez_2026`):**
   ![Curvas de Seletividade - IBM Fez](figures/selectivity_curves_ibm_fez_2026.png)
@@ -172,13 +186,22 @@ python src/run_experimentos.py --qubits 4,6,8,10
 
 ### Execução em hardware real (opcional)
 
-O `grover_paper_hardware.py` submete circuitos a uma QPU real da IBM Quantum. O token
-é lido de um arquivo separado e **nunca** é impresso ou salvo nos resultados:
+O script `grover_paper_hardware.py` submete e executa os circuitos de Grover em uma QPU real da IBM Quantum (como `ibm_fez` ou `ibm_kingston`). 
 
-```bash
-# Token em ~/.config/ibm_quantum/token (padrão)
-python src/grover_paper_hardware.py --backend ibm_fez
-```
+As credenciais do IBM Quantum são resolvidas automaticamente através de 3 métodos (em ordem de prioridade), garantindo privacidade e flexibilidade:
+
+1. **Variável de Ambiente:**
+   ```bash
+   export IBM_QUANTUM_TOKEN="seu_token_aqui"
+   python src/grover_paper_hardware.py --backend ibm_fez
+   ```
+2. **Arquivo de Token (Padrão: `~/.config/ibm_quantum/token`):**
+   Caso a variável de ambiente não esteja configurada, o script tentará ler o token deste arquivo (você pode alterar o caminho usando a flag `--token-file`):
+   ```bash
+   python src/grover_paper_hardware.py --backend ibm_kingston
+   ```
+3. **Credenciais Locais do Qiskit:**
+   Se nenhum token direto for fornecido, o script tentará carregar qualquer conta IBM Quantum previamente salva em sua máquina local via biblioteca do Qiskit (salva anteriormente por meio do comando `QiskitRuntimeService.save_account()`).
 
 ---
 

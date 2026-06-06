@@ -273,8 +273,28 @@ def run_hardware(
     output_path: str,
     token_file: str,
 ) -> None:
-    token = _read_token_file(token_file)
-    service = QiskitRuntimeService(channel="ibm_quantum", token=token)
+    # 1. Tenta obter o token da variável de ambiente
+    token = os.environ.get("IBM_QUANTUM_TOKEN")
+    
+    # 2. Se não houver variável de ambiente, tenta ler do arquivo (caso exista)
+    if not token:
+        token_path = Path(token_file).expanduser()
+        if token_path.exists():
+            token = _read_token_file(token_file)
+
+    # 3. Inicializa o serviço com o token fornecido ou tenta carregar as credenciais salvas localmente pelo Qiskit
+    if token:
+        service = QiskitRuntimeService(channel="ibm_quantum", token=token)
+    else:
+        try:
+            service = QiskitRuntimeService()
+        except Exception as e:
+            raise RuntimeError(
+                "Nenhum token do IBM Quantum foi configurado. Você pode:\n"
+                "  1. Definir a variável de ambiente: export IBM_QUANTUM_TOKEN='seu_token'\n"
+                f"  2. Salvar o token no arquivo: {token_file}\n"
+                "  3. Salvar as credenciais localmente no sistema usando QiskitRuntimeService.save_account()"
+            ) from e
 
     backend = get_backend(service, backend_name)
     backend_name_final = _backend_name(backend)

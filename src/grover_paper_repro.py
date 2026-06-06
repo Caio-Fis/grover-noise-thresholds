@@ -31,6 +31,7 @@ import numpy as np
 from qiskit import QuantumCircuit, transpile
 from qiskit.circuit.library import MCXGate
 from qiskit_aer import AerSimulator
+from qiskit_aer.library import save_density_matrix
 from qiskit_aer.noise import (
     NoiseModel,
     amplitude_damping_error,
@@ -127,6 +128,7 @@ BASIS_GATES = ["u", "cx"]
 
 # Single global AerSimulator instance to avoid heavy C++ backend initialization overhead in sweep loops.
 SIMULATOR = AerSimulator()
+DENSITY_MATRIX_SIMULATOR = AerSimulator(method="density_matrix")
 
 
 @dataclass(frozen=True)
@@ -373,29 +375,15 @@ def run_circuit_probs(
 ) -> Dict[str, float]:
     hls_config = HLSConfig()
     hls_config.set_methods("mcx", [mcx_method])
-    # Avoid passing backend with basis_gates to keep Aer warnings away and
-    # ensure a stable "u"/"cx" basis for the noise model.
+    # Evita passar o backend com basis_gates para manter os avisos do Aer longe e
+    # garantir uma base estável "u"/"cx" para o modelo de ruído.
     transpiled = transpile(
         circuit,
         basis_gates=BASIS_GATES,
         optimization_level=OPTIMIZATION_LEVEL,
         hls_config=hls_config,
     )
-
-    num_qubits = transpiled.num_qubits
-    method = "statevector" if num_qubits >= 8 else "automatic"
-    simulator = AerSimulator(method=method)
-    actual_runs = 1 if num_qubits >= 8 else runs
-
-    counts_sum: Dict[str, int] = {}
-    for _ in range(actual_runs):
-        result = simulator.run(transpiled, shots=shots, noise_model=noise_model).result()
-        counts = result.get_counts()
-        for state, count in counts.items():
-            counts_sum[state] = counts_sum.get(state, 0) + count
-
-    total = shots * actual_runs
-    return {state: count / total for state, count in counts_sum.items()}
+    return run_transpiled_circuit_probs(transpiled, noise_model, shots, runs)
 
 
 def run_transpiled_circuit_probs(
@@ -405,19 +393,27 @@ def run_transpiled_circuit_probs(
     runs: int,
 ) -> Dict[str, float]:
     num_qubits = transpiled_circuit.num_qubits
-    method = "statevector" if num_qubits >= 8 else "automatic"
-    simulator = AerSimulator(method=method)
-    actual_runs = 1 if num_qubits >= 8 else runs
-
-    counts_sum: Dict[str, int] = {}
-    for _ in range(actual_runs):
-        result = simulator.run(transpiled_circuit, shots=shots, noise_model=noise_model).result()
-        counts = result.get_counts()
-        for state, count in counts.items():
-            counts_sum[state] = counts_sum.get(state, 0) + count
-
-    total = shots * actual_runs
-    return {state: count / total for state, count in counts_sum.items()}
+    
+    # Remove as medições finais para evitar o colapso do estado misto antes de salvar a matriz de densidade
+    circuit_no_meas = transpiled_circuit.remove_final_measurements(inplace=False)
+    
+    # Adiciona a operação para salvar a matriz de densidade exata
+    circuit_no_meas.save_density_matrix()
+    
+    # Executa a simulação exata analítica utilizando o simulador global reutilizável (shots e runs ignorados)
+    result = DENSITY_MATRIX_SIMULATOR.run(circuit_no_meas, noise_model=noise_model).result()
+    dm = result.data()["density_matrix"]
+    
+    # Obtém a distribuição de probabilidades exata sobre os 2^n estados da base
+    probs_array = dm.probabilities()
+    probs_dict = {}
+    for i, p in enumerate(probs_array):
+        # Filtra valores extremamente pequenos (ruído de precisão float) para manter o dicionário limpo e rápido
+        if p > 1e-12:
+            state_str = f"{i:0{num_qubits}b}"
+            probs_dict[state_str] = float(p)
+            
+    return probs_dict
 
 
 def combine_distributions(
