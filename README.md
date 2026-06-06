@@ -60,23 +60,6 @@ Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston.
 > **Nota.** As pequenas flutuações nos algoritmos locais (`M1GA`/`M1GAA`) decorrem da
 > natureza estocástica das simulações Monte Carlo sob `SHOTS` finitos.
 
-### Recursos de Circuito: Contagem de Portas CNOT
-Esta tabela apresenta o número total de portas CNOT (`cx`) executadas por cada algoritmo após a transpilação para a base nativa `["u", "cx"]`. Para os algoritmos locais de dois estágios (`M2GA`/`M2GAA`), indicamos a soma total e, entre parênteses, o número de portas em cada estágio executado de forma independente (`estágio 1 + estágio 2`):
-
-| Algoritmo | 4 Qubits | 6 Qubits | 8 Qubits | 10 Qubits |
-| :--- | :---: | :---: | :---: | :---: |
-| `SGA` | 84 | 1008 | 5280 | 22200 |
-| `SGAA` | 72 | 288 | 864 | 2400 |
-| `M1GA` | 45 | 540 | 2808 | 12000 |
-| `M1GAA` | 39 | 180 | 2622 | 11586 |
-| `M2GA` | 4 (2+2) | 48 (24+24) | 168 (84+84) | 576 (288+288) |
-| `M2GAA` | 4 (2+2) | 48 (24+24) | 144 (72+72) | 288 (144+144) |
-
-Abaixo, a visualização gráfica desse escalonamento (em escala logarítmica) destaca a vantagem monumental da família de dois estágios em relação às abordagens clássicas:
-
-![Escalonamento de CNOTs](figures/cnot_complexity.png)
-
-A redução monumental na quantidade de portas CNOT executadas pela família de dois estágios (`M2GA`/`M2GAA`) justifica diretamente a menor exigência de tempos de coerência térmica ($T_1$/$T_2$) e a maior robustez a erros de porta observada nos resultados.
 
 ### Visualização dos Resultados
 
@@ -109,6 +92,14 @@ Esta figura indica o tempo mínimo de coerência térmica ($T_1$/$T_2$ em $\mu s
   ![Escalonamento Térmico - IBM Fez](figures/thermal_scaling_ibm_fez_2026.png)
 * **Perfil IBM Kingston (`ibm_kingston_2026`):**
   ![Escalonamento Térmico - IBM Kingston](figures/thermal_scaling_ibm_kingston_2026.png)
+
+---
+
+#### 4. Recursos de Circuito: Escalonamento de Portas CNOT (4 a 10 Qubits)
+Esta figura apresenta o número total de portas CNOT (`cx`) executadas por cada algoritmo após a transpilação para a base nativa `["u", "cx"]`. A escala logarítmica evidencia como o Grover padrão (`SGA` e `SGAA`) sofre com uma explosão exponencial na quantidade de portas de dois qubits (passando de dezenas para dezenas de milhares de CNOTs), enquanto a família de dois estágios (`M2GA`/`M2GAA`) escala de forma extremamente otimizada e mantendo um número reduzido de CNOTs (apenas 288 portas para `M2GAA` em 10 qubits). Esse resultado justifica diretamente a menor exigência de coerência térmica e a maior tolerância a ruídos exibida pelos algoritmos locais.
+
+* **Complexidade de Portas CNOT:**
+  ![Escalonamento de CNOTs](figures/cnot_complexity.png)
 
 ---
 
