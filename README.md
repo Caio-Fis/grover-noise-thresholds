@@ -72,6 +72,10 @@ Esta tabela apresenta o número total de portas CNOT (`cx`) executadas por cada 
 | `M2GA` | 4 (2+2) | 48 (24+24) | 168 (84+84) | 576 (288+288) |
 | `M2GAA` | 4 (2+2) | 48 (24+24) | 144 (72+72) | 288 (144+144) |
 
+Abaixo, a visualização gráfica desse escalonamento (em escala logarítmica) destaca a vantagem monumental da família de dois estágios em relação às abordagens clássicas:
+
+![Escalonamento de CNOTs](figures/cnot_complexity.png)
+
 A redução monumental na quantidade de portas CNOT executadas pela família de dois estágios (`M2GA`/`M2GAA`) justifica diretamente a menor exigência de tempos de coerência térmica ($T_1$/$T_2$) e a maior robustez a erros de porta observada nos resultados.
 
 ### Visualização dos Resultados
