@@ -308,10 +308,13 @@ def run_hardware(
         )
     sampler = Sampler(mode=backend)
 
+    circuits_to_run = []
+    num_qubits_to_run = []
+    job_mappings = []
+
+    print("[INFO] Building and preparing all quantum circuits...")
     for algo in algorithms:
-        print(f"[INFO] Running on backend {backend_name_final}: {algo.name}")
         for n in qubit_counts:
-            print(f"[INFO]  Qubits: n={n}")
             target_bits = "1" * n
             prefix_len = n // 2
             mcx_method = MCX_MCTA if algo.use_mcta else MCX_NOANCILLA
@@ -321,42 +324,95 @@ def run_hardware(
             )
 
             if single is not None:
-                gate_counts, total_gates = count_gates(single, backend, mcx_method)
-                probs_list, shots_list, job_details = run_sampler(
-                    sampler, [single], [n], shots, repeats
-                )
-                probs = probs_list[0]
-                shots_total = shots_list[0]
+                circ_idx = len(circuits_to_run)
+                circuits_to_run.append(single)
+                num_qubits_to_run.append(n)
+                job_mappings.append({
+                    "algo": algo,
+                    "n": n,
+                    "target_bits": target_bits,
+                    "mcx_method": mcx_method,
+                    "single": single,
+                    "circ_idx": circ_idx,
+                    "stage1_idx": None,
+                    "stage2_idx": None,
+                    "prefix_len": prefix_len
+                })
             else:
-                gate_counts_1, total_1 = count_gates(stage1, backend, mcx_method)
-                gate_counts_2, total_2 = count_gates(stage2, backend, mcx_method)
-                probs_list, shots_list, job_details = run_sampler(
-                    sampler, [stage1, stage2], [prefix_len, n - prefix_len], shots, repeats
-                )
-                probs = combine_distributions(probs_list[0], probs_list[1])
-                shots_total = min(shots_list)
-                gate_counts = {"stage1": gate_counts_1, "stage2": gate_counts_2}
-                total_gates = int(total_1 + total_2)
+                s1_idx = len(circuits_to_run)
+                circuits_to_run.append(stage1)
+                num_qubits_to_run.append(prefix_len)
 
-            selectivity, pt, phn = calculate_selectivity(probs, target_bits)
-            record = {
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "backend": backend_name_final,
-                "shots": shots,
-                "repeats": repeats,
-                "algorithm": algo.name,
-                "n_qubits": n,
-                "target_state": target_bits,
-                "success_prob": pt,
-                "max_noise_prob": phn,
-                "selectivity": selectivity,
-                "shots_total": shots_total,
-                "gate_counts": gate_counts,
-                "total_gates": total_gates,
-                "jobs": job_details,
-            }
-            _append_jsonl(output_path, record)
-            print(f"[INFO]  Result appended: {output_path}")
+                s2_idx = len(circuits_to_run)
+                circuits_to_run.append(stage2)
+                num_qubits_to_run.append(n - prefix_len)
+
+                job_mappings.append({
+                    "algo": algo,
+                    "n": n,
+                    "target_bits": target_bits,
+                    "mcx_method": mcx_method,
+                    "single": None,
+                    "stage1": stage1,
+                    "stage2": stage2,
+                    "circ_idx": None,
+                    "stage1_idx": s1_idx,
+                    "stage2_idx": s2_idx,
+                    "prefix_len": prefix_len
+                })
+
+    print(f"[INFO] Submitting batch of {len(circuits_to_run)} circuits to backend {backend_name_final}...")
+    probs_list, shots_list, job_details = run_sampler(
+        sampler, circuits_to_run, num_qubits_to_run, shots, repeats
+    )
+    print(f"[SUCCESS] Batch execution finished. Processing results...")
+
+    # Process and save the results for each configuration
+    for mapping in job_mappings:
+        algo = mapping["algo"]
+        n = mapping["n"]
+        target_bits = mapping["target_bits"]
+        mcx_method = mapping["mcx_method"]
+        prefix_len = mapping["prefix_len"]
+
+        if mapping["circ_idx"] is not None:
+            # Algoritmo de estágio único (SGA, SGAA, M1GA, M1GAA)
+            idx = mapping["circ_idx"]
+            probs = probs_list[idx]
+            shots_total = shots_list[idx]
+            gate_counts, total_gates = count_gates(mapping["single"], backend, mcx_method)
+        else:
+            # Algoritmo de dois estágios (M2GA, M2GAA)
+            s1_idx = mapping["stage1_idx"]
+            s2_idx = mapping["stage2_idx"]
+            probs = combine_distributions(probs_list[s1_idx], probs_list[s2_idx])
+            shots_total = min(shots_list[s1_idx], shots_list[s2_idx])
+
+            gate_counts_1, total_1 = count_gates(mapping["stage1"], backend, mcx_method)
+            gate_counts_2, total_2 = count_gates(mapping["stage2"], backend, mcx_method)
+            gate_counts = {"stage1": gate_counts_1, "stage2": gate_counts_2}
+            total_gates = int(total_1 + total_2)
+
+        selectivity, pt, phn = calculate_selectivity(probs, target_bits)
+        
+        record = {
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "backend": backend_name_final,
+            "shots": shots,
+            "repeats": repeats,
+            "algorithm": algo.name,
+            "n_qubits": n,
+            "target_state": target_bits,
+            "success_prob": pt,
+            "max_noise_prob": phn,
+            "selectivity": selectivity,
+            "shots_total": shots_total,
+            "gate_counts": gate_counts,
+            "total_gates": total_gates,
+            "jobs": job_details,
+        }
+        _append_jsonl(output_path, record)
+        print(f"[INFO] Result saved for {algo.name} (n={n}) to {output_path}")
 
 
 def _append_jsonl(path: str, record: Dict[str, object]) -> None:
