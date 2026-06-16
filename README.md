@@ -57,16 +57,13 @@ Varredura de 4 a 10 qubits sob os perfis IBM Fez e IBM Kingston.
 - **Robustez a ruído de porta.** A 4 qubits, o M2GA tolera ~4,5% de erro de
   depolarização, contra apenas ~0,30% do SGA.
 
-> **Nota.** As pequenas flutuações nos algoritmos locais (`M1GA`/`M1GAA`) decorrem da
-> natureza estocástica das simulações Monte Carlo sob `SHOTS` finitos.
-
 
 ### Visualização dos Resultados
 
 As figuras a seguir foram geradas a partir dos dados consolidados na pasta `data/` usando o script `src/plot_results.py`.
 
 #### 1. Curvas de Seletividade vs. Taxa de Erro (8 Qubits)
-Esta figura demonstra a degradação da seletividade do algoritmo ($S$ em dB) conforme a probabilidade de erro de porta ($p$) cresce, sob os 5 canais de ruído avaliados. A linha horizontal tracejada preta marca o limiar de sucesso crítico de **$S = 3.0\text{ dB}$**. O ponto exato onde a curva de um algoritmo intercepta essa linha indica a sua taxa limite de ruído tolerada; curvas que se mantêm acima e à direita por mais tempo representam algoritmos mais robustos. Fica nítido o rápido colapso dos algoritmos tradicionais (`SGA` e `SGAA`) em 8 qubits, enquanto a família de dois estágios (`M2GA`/`M2GAA`) mantém seletividade excelente até em taxas de ruído severas. As flutuações acentuadas observadas em alguns pontos das curvas decorrem do caráter estocástico da simulação de Monte Carlo sob um número finito de `SHOTS` (512) e `RUNS` (2) na base de dados anterior, gerando ruído estatístico de amostragem que é completamente eliminado na nova abordagem analítica via matriz de densidade.
+Esta figura demonstra a degradação da seletividade do algoritmo ($S$ em dB) conforme a probabilidade de erro de porta ($p$) cresce, sob os 5 canais de ruído avaliados. A linha horizontal tracejada preta marca o limiar de sucesso crítico de **$S = 3.0\text{ dB}$**. O ponto exato onde a curva de um algoritmo intercepta essa linha indica a sua taxa limite de ruído tolerada; curvas que se mantêm acima e à direita por mais tempo representam algoritmos mais robustos. Fica nítido o rápido colapso dos algoritmos tradicionais (`SGA` e `SGAA`) em 8 qubits, enquanto a família de dois estágios (`M2GA`/`M2GAA`) mantém seletividade excelente até em taxas de ruído severas.
 
 * **Perfil IBM Fez (`ibm_fez_2026`):**
   ![Curvas de Seletividade - IBM Fez](figures/selectivity_curves_ibm_fez_2026.png)
